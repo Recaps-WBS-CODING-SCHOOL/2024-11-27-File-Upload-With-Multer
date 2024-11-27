@@ -16,6 +16,30 @@ const App = () => {
         e.preventDefault();
         try {
             setLoading(true);
+            // For this to work, must add name="image" attribute to the file input.
+            // Any other inputs would also need the name input
+            const formData = new FormData(e.target);
+
+            // The following is how we demoed it in the recap.
+            // const formData = new FormData(e.target);
+            // console.log('target', e.target);
+            // console.log('target[0]', e.target[0]);
+            // console.log('target[0].files', e.target[0].files);
+            // console.log('target[0].files[0]', e.target[0].files[0]);
+
+            // formData.append('image', e.target[0].files[0]);
+
+            const res = await fetch('http://localhost:8080/file-upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!res.ok) {
+                const { error } = await res.json();
+                throw new Error(error);
+            }
+            const data = await res.json();
+            setImage(data.location);
         } catch (error) {
             setError(error.message);
         } finally {
@@ -31,6 +55,7 @@ const App = () => {
                 onSubmit={handleSubmit}
             >
                 <input
+                    name='image'
                     type='file'
                     className='file-input input-bordered w-full'
                 />
